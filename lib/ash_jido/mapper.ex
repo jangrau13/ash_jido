@@ -67,7 +67,9 @@ defmodule AshJido.Mapper do
   defp maybe_convert_to_maps(data, _config), do: convert_to_maps(data)
 
   defp convert_to_maps(data) when is_list(data) do
-    Enum.map(data, &convert_to_maps/1)
+    # Wrap list results in a map so Jido's action runtime (Map.split) can handle them.
+    # Read actions return lists, but Jido expects map results.
+    %{results: Enum.map(data, &convert_to_maps/1), count: length(data)}
   end
 
   defp convert_to_maps(%_{} = struct) do
